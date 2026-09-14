@@ -29,3 +29,12 @@
 - Release upload attempted through the GitHub connector; GitHub returned HTTP 403 Resource not accessible by integration. No remote commit or deployment was created. Browser sign-in as saarushjaiswal still lacks Pages administration; owner authentication is required.
 
 - Owner sign-in completed. Pages confirmed main/root legacy source, schicane.com custom domain, successful DNS check and Enforce HTTPS enabled. Publishing source switched to GitHub Actions; CNAME and HTTPS were preserved. GitHub CLI device authorization completed as schicane for release upload.
+
+## Production release verified — 2026-09-14
+
+- Release commit a141617 deployed successfully in Actions run 34882328981: https://github.com/schicane/schicane.com/actions/runs/34882328981.
+- GitHub-hosted Linux build, content tests, TypeScript, export verification, diagnostic artifact upload, Pages deployment and public HTTPS checks all succeeded.
+- Live verification at 18:44 UTC returned HTTP 200 for all five requested pages, the launch article, RSS, sitemap, robots and social image. HTTP redirects to HTTPS with 301. An unknown route returns HTTP 404 with the branded error page.
+- The live homepage displays the new editorial design and source links correctly, with no browser warnings or errors observed. Local responsive checks covered 390, 768, 1024 and 1440px.
+- Full local release check results are saved in logs/live-verification.json. CI diagnostic logs are available in the run's build-logs artifact. Both the original CNAME and enforced HTTPS remain intact.
+
