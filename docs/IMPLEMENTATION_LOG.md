@@ -27,3 +27,5 @@
 - Initial HTTPS domain response passed before changes. Production deployment and post-release HTTPS checks await authenticated Pages administration.
 
 - Release upload attempted through the GitHub connector; GitHub returned HTTP 403 Resource not accessible by integration. No remote commit or deployment was created. Browser sign-in as saarushjaiswal still lacks Pages administration; owner authentication is required.
+
+- Owner sign-in completed. Pages confirmed main/root legacy source, schicane.com custom domain, successful DNS check and Enforce HTTPS enabled. Publishing source switched to GitHub Actions; CNAME and HTTPS were preserved. GitHub CLI device authorization completed as schicane for release upload.
