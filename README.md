@@ -1,0 +1,2 @@
+# schicane.com
+Ai blog
