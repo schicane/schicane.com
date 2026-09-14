@@ -1,0 +1,74 @@
+name: Build and deploy Schicane
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "15 12 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run verify
+      - name: Upload diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: logs/
+          retention-days: 14
+      - name: Upload static site
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Deployment summary
+        env:
+          DEPLOYED_URL: ${{ steps.deployment.outputs.page_url }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          echo "### Schicane deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: $DEPLOYED_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit: $COMMIT" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify public HTTPS routes
+        run: |
+          for route in / /ai/ /ai/weekly/ /about/ /methodology/ /rss.xml /sitemap.xml; do
+            curl --fail --silent --show-error --location --retry 8 --retry-all-errors --retry-delay 10 "https://schicane.com$route" -o /dev/null
+            echo "HTTPS OK: $route"
+          done
